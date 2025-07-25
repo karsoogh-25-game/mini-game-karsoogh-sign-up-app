@@ -42,14 +42,10 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function showSection(id){
         const currentActiveSection = document.querySelector('.content-section.active');
-        // --- DEBUG ---
-        console.log(`Trying to find section with id: "${id}"`);
         const nextSectionToShow    = document.getElementById(id);
-        console.log(`Element found for id "${id}":`, nextSectionToShow);
-        // --- END DEBUG ---
 
         if (!nextSectionToShow) {
-            console.warn(`Section with id "${id}" not found.`); // This is the original warning line
+            console.warn(`Section with id "${id}" not found.`);
             return;
         }
         if (currentActiveSection && currentActiveSection.id === id) return; // Already active
@@ -94,6 +90,11 @@ document.addEventListener('DOMContentLoaded', function(){
     window.showSection = showSection; // Expose globally if needed by other scripts
 
     function initializeActiveTab() {
+        // --- FIX: Do not initialize a default tab if a puzzle room URL is active ---
+        if (window.location.pathname.startsWith('/dashboard/rooms/')) {
+            return;
+        }
+
         updateMenuItems(); // Ensure allMenuItems is populated before use
 
         const desktopMenuContainer = document.getElementById('desktop-menu');

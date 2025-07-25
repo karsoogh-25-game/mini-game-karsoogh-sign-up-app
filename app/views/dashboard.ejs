@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>پنل کاربری</title>
+  <script>
+    // Anti-flicker script
+    (function() {
+      const path = window.location.pathname;
+      if (path.startsWith('/dashboard/rooms/')) {
+        // Hide dashboard and show puzzle room immediately
+        const style = document.createElement('style');
+        style.innerHTML = `
+          #dashboard { display: none !important; }
+          #puzzle-room { display: block !important; opacity: 1 !important; }
+        `;
+        document.head.appendChild(style);
+      }
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/leaderboard.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -46,9 +61,6 @@
     .content-section.fade-in {
       opacity: 1 !important;
     }
-    .menu-item {
-        display: none;
-    }
   </style>
 </head>
 <body class="bg-pattern font-wazir flex h-screen overflow-hidden">
@@ -77,6 +89,7 @@
              { id:'ammunition_store', label:'فروشگاه مهمات', icon:'cubes' }, // Changed icon to fa-cubes
              { id:'scoreboard',label:'جدول امتیازات', icon:'list-ol' },
              { id:'announcements',label:'اطلاعیه‌ها', icon:'bullhorn' },
+             { id:'messages',label:'پیام‌ها', icon:'envelope' },
              { id:'radio',     label:'رادیو', icon:'broadcast-tower' }
            ];
         %>
@@ -209,6 +222,18 @@
         
       <section id="radio" class="content-section hidden p-4"></section>
 
+      <section id="puzzle-room" class="content-section hidden">
+        <!-- This section will be dynamically populated by /js/puzzle-room.js -->
+        <div id="puzzle-room-content" class="max-w-4xl mx-auto text-white">
+            <!-- Loading spinner -->
+            <div id="puzzle-room-loading" class="text-center py-10">
+                <div class="w-12 h-12 border-t-4 border-blue-500 border-solid rounded-full animate-spin mx-auto"></div>
+                <p class="mt-4">در حال بارگذاری اتاق معما...</p>
+            </div>
+            <!-- Dynamic content will be injected here -->
+        </div>
+      </section>
+
       <section id="territory_defense" class="content-section hidden">
         <div id="game-territory-loading" class="text-center text-gray-300 py-8">در حال بارگذاری اطلاعات بازی...</div>
         <div id="game-territory-content" class="hidden"></div>
@@ -216,6 +241,12 @@
 
       <section id="ammunition_store" class="content-section hidden">
           <div id="game-ammunition-content" class="text-gray-300"></div>
+      </section>
+
+      <section id="messages" class="content-section hidden">
+        <div id="messages-list" class="space-y-4 text-gray-300">
+          <p class="text-gray-400 text-center py-6">در حال بارگذاری پیام‌ها…</p>
+        </div>
       </section>
       </main>
   </div>
@@ -237,5 +268,7 @@
   <script src="/js/radio-listener.js"></script>
   <script src="/js/game-territory.js"></script>
   <script src="/js/game-ammunition.js"></script>
+  <script src="/js/puzzle-room.js"></script>
+  <script src="/js/messages.js"></script>
   </body>
 </html>
