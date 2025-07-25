@@ -341,7 +341,10 @@ const start = async () => {
     console.log(`AdminJS (Super User Panel) is available at http://localhost:${process.env.PORT || 3000}${adminJs.options.rootPath}`);
     
     const port = process.env.PORT || 3000;
-    server.listen(port, () => console.log(`Server is listening on port ${port}`));
+    server.listen(port, '0.0.0.0', () => {
+  console.log(`Server is listening on http://0.0.0.0:${port}`);
+	});
+
 };
 
 
