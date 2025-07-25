@@ -48,32 +48,63 @@ exports.addMember = async (req, res) => {
   }
 };
 
+const { sequelize, Group, GroupMember, User } = require('../models');
+const { Op } = require('sequelize'); 
+
 exports.leaveGroup = async (req, res) => {
-  const userId = req.session.userId;
-  const { groupId } = req.body;
-  const io = req.app.get('io'); // گرفتن io
-  const t = await sequelize.transaction();
-  try {
-    await GroupMember.destroy({ where:{ groupId, userId } }, { transaction:t });
-    const group = await Group.findByPk(groupId, { transaction:t });
-    if (group.leaderId === userId) {
-      const others = await GroupMember.findAll({ where:{ groupId }, transaction:t });
-      if (others.length > 0) {
-        const nxt = others[Math.floor(Math.random()*others.length)];
-        await Group.update({ leaderId:nxt.userId }, { where:{ id:groupId }, transaction:t });
-        await GroupMember.update({ role:'leader' }, { where:{ groupId, userId:nxt.userId }, transaction:t });
-      } else {
-        await group.destroy({ transaction:t });
-        io.emit('leaderboardUpdate'); // ارسال رویداد
-      }
+    const userId = req.session.userId;
+    const { groupId } = req.body;
+    const io = req.app.get('io');
+    const t = await sequelize.transaction();
+
+    try {
+        const group = await Group.findByPk(groupId, { transaction: t });
+        if (!group) {
+            await t.rollback();
+            return res.status(404).json({ success: false, message: 'گروه یافت نشد.' });
+        }
+
+        const memberRecord = await GroupMember.findOne({ where: { groupId, userId }, transaction: t });
+        if (!memberRecord) {
+            await t.rollback();
+            return res.status(403).json({ success: false, message: 'شما عضو این گروه نیستید.' });
+        }
+
+        if (group.leaderId === userId) {
+            const otherMembers = await GroupMember.findAll({
+                where: {
+                    groupId,
+                    userId: { [Op.ne]: userId } 
+                },
+                transaction: t
+            });
+
+            if (otherMembers.length > 0) {
+                const newLeader = otherMembers[0];
+
+                await Group.update({ leaderId: newLeader.userId }, { where: { id: groupId }, transaction: t });
+
+                if (GroupMember.rawAttributes.role) {
+                     await GroupMember.update({ role: 'leader' }, { where: { groupId, userId: newLeader.userId }, transaction: t });
+                }
+
+            } else {
+                await group.destroy({ transaction: t });
+                io.emit('leaderboardUpdate');
+            }
+        }
+
+        await memberRecord.destroy({ transaction: t });
+
+        await t.commit();
+
+        res.json({ success: true, message: 'شما با موفقیت از گروه خارج شدید.' });
+
+    } catch (err) {
+        await t.rollback();
+        console.error('leaveGroup error:', err);
+        res.status(500).json({ success: false, message: 'خطا در خروج از گروه' });
     }
-    await t.commit();
-    res.json({ success:true });
-  } catch(err) {
-    await t.rollback();
-    console.error('leaveGroup error:', err);
-    res.status(500).json({ success:false, message:'خطا در خروج از گروه' });
-  }
 };
 
 exports.getMyGroup = async (req, res) => {
