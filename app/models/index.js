@@ -38,6 +38,8 @@ db.QuestionBankSetting     = require('./questionBankSetting')(sequelize, DataTyp
 db.Question                = require('./question')(sequelize, DataTypes);
 db.PurchasedQuestion       = require('./purchasedQuestion')(sequelize, DataTypes);
 db.SubmittedCombo          = require('./submittedCombo')(sequelize, DataTypes);
+db.Channel                 = require('./channel.model')(sequelize, DataTypes);
+db.Message                 = require('./message.model')(sequelize, DataTypes);
 
 // Game Models
 db.GameMap                 = require('./GameMap')(sequelize, DataTypes);
@@ -47,6 +49,17 @@ db.Ammunition              = require('./Ammunition')(sequelize, DataTypes);
 db.AmmunitionInventory     = require('./AmmunitionInventory')(sequelize, DataTypes);
 db.DeployedAmmunition      = require('./DeployedAmmunition')(sequelize, DataTypes);
 db.AttackWave              = require('./AttackWave')(sequelize, DataTypes);
+
+// Puzzle Room Models
+db.Room                    = require('./Room')(sequelize, DataTypes);
+db.GroupRoomStatus         = require('./GroupRoomStatus')(sequelize, DataTypes);
+
+// Competition Games Models
+db.InvestmentGame          = require('./InvestmentGame')(sequelize, DataTypes);
+db.InvestmentEntry         = require('./InvestmentEntry')(sequelize, DataTypes);
+db.RiskGame                = require('./RiskGame')(sequelize, DataTypes);
+db.RiskEntry               = require('./RiskEntry')(sequelize, DataTypes);
+
 
 Object.values(db).forEach(model => {
   if (typeof model.associate === 'function') {

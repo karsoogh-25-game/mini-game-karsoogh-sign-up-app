@@ -67,14 +67,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-function isAdmin(req, res, next) {
-  if (req.session.adminId) return next();
-  res.redirect('/');
-}
-function isUser(req, res, next) {
-  if (req.session.userId) return next();
-  res.redirect('/');
-}
+const { isAdmin, isUser } = require('./middlewares/auth');
 
 // Placeholder for a more sophisticated role check
 async function isAdminOrMentor(req, res, next) {
@@ -153,6 +146,12 @@ app.use('/admin/api/question-bank', isAdmin, adminQuestionBankRouter);
 const questionBankUserRouter = require('./routes/questionBank');
 app.use('/api/question-bank', isUser, questionBankUserRouter);
 
+// --- Puzzle Room Routes ---
+const puzzleRoomApiRouter = require('./routes/api/puzzleRoom');
+app.use('/api/puzzle-room', isUser, puzzleRoomApiRouter);
+const adminPuzzleRoomRouter = require('./routes/adminPuzzleRoom');
+app.use('/admin/api/puzzle-room', isAdmin, adminPuzzleRoomRouter);
+
 // --- Territory Defense Game Routes ---
 const gameUserRoutes = require('./routes/game'); // User routes for the game
 app.use('/api/game', isUser, gameUserRoutes);
@@ -161,8 +160,18 @@ const adminGameManagementRoutes = require('./routes/adminGameManagement'); // Ad
 app.use('/admin/api/game', isAdmin, adminGameManagementRoutes);
 // --- End Territory Defense Game Routes ---
 
+// --- Economic Games Routes ---
+const adminEconomicGamesRouter = require('./routes/adminEconomicGames');
+app.use('/admin/api/games', isAdmin, adminEconomicGamesRouter);
+const economicGamesRouter = require('./routes/economicGames');
+app.use('/api/games', isUser, economicGamesRouter);
+// --- End Economic Games Routes ---
+
 // Dashboard
 app.use('/dashboard', isUser, require('./routes/user'));
+
+// Messages
+app.use('/api/messages', require('./routes/messages'));
 
 // Feature Flags
 app.get('/api/features/initial', isUser, async (req, res) => {
@@ -258,6 +267,11 @@ io.on('connection', socket => {
   socket.on('disconnect', () => {
     console.log(`Socket disconnected: ${socket.id}`);
   });
+
+  if (socket.request.session.userId) {
+    socket.join(`user-${socket.request.session.userId}`);
+    console.log(`Socket ${socket.id} joined room: user-${socket.request.session.userId}`);
+  }
 });
 
 async function seedAdmin() {
@@ -280,6 +294,9 @@ async function seedFeatureFlags() {
     { name: 'menu_question_bank', displayName: 'منوی بانک سوال', isEnabled: true, category: 'menu' },
     { name: 'menu_territory_defense', displayName: 'منوی دفاع از قلمرو', isEnabled: true, category: 'menu' },
     { name: 'menu_ammunition_store', displayName: 'منوی فروشگاه مهمات', isEnabled: true, category: 'menu' },
+    { name: 'menu_messages', displayName: 'منوی پیام‌ها', isEnabled: true, category: 'menu' },
+    { name: 'menu_investment_game', displayName: 'منوی سرمایه‌گذاری', isEnabled: true, category: 'menu' },
+    { name: 'menu_risk_game', displayName: 'منوی بازی ریسک', isEnabled: true, category: 'menu' },
     { name: 'action_group_leave', displayName: 'عملیات خروج از گروه', isEnabled: true, category: 'action' },
     { name: 'action_group_delete', displayName: 'عملیات حذف گروه (توسط سرگروه)', isEnabled: true, category: 'action' },
     // Feature flag for admin panel section
@@ -315,6 +332,24 @@ const start = async () => {
             db.PurchasedQuestion, db.SubmittedCombo, db.Announcement,
             db.AnnouncementAttachment, db.Content, db.ContentAttachment,
             db.FeatureFlag, db.QuestionBankSetting,
+            {
+                resource: db.Channel,
+                options: {
+                    properties: {
+                        name: { isRequired: true }
+                    }
+                }
+            },
+            {
+                resource: db.Message,
+                options: {
+                    properties: {
+                        content: { isRequired: true },
+                        channelId: { isRequired: true },
+                        senderId: { isRequired: true }
+                    }
+                }
+            },
             // Game Models for AdminJS
             db.GameMap,
             db.Tile,
@@ -322,7 +357,15 @@ const start = async () => {
             db.Ammunition,
             db.AmmunitionInventory,
             db.DeployedAmmunition,
-            db.AttackWave
+            db.AttackWave,
+            // Economic Games
+            db.InvestmentGame,
+            db.InvestmentEntry,
+            db.RiskGame,
+            db.RiskEntry,
+            // Puzzle Room Models
+            db.Room,
+            db.GroupRoomStatus
         ],
         rootPath: '/super-admin', 
         branding: {
@@ -341,10 +384,7 @@ const start = async () => {
     console.log(`AdminJS (Super User Panel) is available at http://localhost:${process.env.PORT || 3000}${adminJs.options.rootPath}`);
     
     const port = process.env.PORT || 3000;
-    server.listen(port, '0.0.0.0', () => {
-  console.log(`Server is listening on http://0.0.0.0:${port}`);
-	});
-
+    server.listen(port, () => console.log(`Server is listening on port ${port}`));
 };
 
 

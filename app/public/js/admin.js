@@ -11,7 +11,10 @@ new Vue({
     adminFeaturesMixin,
     adminRadioMixin,
     adminQuestionBankMixin, // Added Question Bank Mixin
-    adminGameManagementMixin // New Mixin for Territory Defense Game Management
+    adminGameManagementMixin, // New Mixin for Territory Defense Game Management
+    adminPuzzleRoomMixin, // --- ADDED PUZZLE ROOM MIXIN ---
+    adminChannelsMixin,
+    adminEconomicGamesMixin // Added Economic Games Mixin
   ],
   data: {
     editingId: null,
@@ -23,12 +26,16 @@ new Vue({
       { key: 'groups', label: 'گروه‌ها' },
       { key: 'items', label: 'فروشگاه' },
       { key: 'contents', label: 'محتواها' },
+      { key: 'economic_games', label: 'بازی‌های مسابقه' },
       { key: 'game_management', label: 'مدیریت دفاع از قلمرو', featureFlag: 'admin_game_management' }, // New Admin Section
+      { key: 'puzzle_room_management', label: 'مدیریت اتاق معما' },
+      { key: 'puzzle_room_correction', label: 'تصحیح معما' },
       { key: 'question_bank_questions', label: 'طرح سوال (بانک سوال)' },
       { key: 'question_bank_correction', label: 'تصحیح سوالات (بانک سوال)' },
       { key: 'question_bank_settings', label: 'تنظیمات بانک سوال' },
       { key: 'features', label: 'مدیریت رویدادها' },
-      { key: 'radio', label: 'رادیو' }
+      { key: 'radio', label: 'رادیو' },
+      { key: 'channels', label: 'کانال‌ها و پیام‌ها' }
     ],
     // userRole will be determined in created/mounted based on session or an API call if needed
     // For now, we assume `isAdminUser` computed property will handle admin-specific UI.
@@ -142,6 +149,12 @@ new Vue({
                 await this.fetchCurrencies();
                 await this.fetchUniqueItems();
                 break;
+            case 'puzzle_room_management':
+                if (typeof this.fetchPuzzleRooms === 'function') await this.fetchPuzzleRooms();
+                break;
+            case 'puzzle_room_correction':
+                if (typeof this.fetchPuzzleSubmissions === 'function') await this.fetchPuzzleSubmissions();
+                break;
             case 'question_bank_questions':
                 if (typeof this.fetchQuestions === 'function') await this.fetchQuestions();
                 break;
@@ -161,6 +174,14 @@ new Vue({
                 break;
             case 'radio':
                 // No specific data to load initially for radio, it's event-driven
+                break;
+            case 'channels':
+                if (typeof this.fetchChannels === 'function') await this.fetchChannels();
+                if (typeof this.fetchGroupsForSelection === 'function') await this.fetchGroupsForSelection();
+                if (typeof this.fetchMembershipMatrix === 'function') await this.fetchMembershipMatrix();
+                break;
+            case 'economic_games':
+                if (typeof this.fetchEconomicGamesStatus === 'function') await this.fetchEconomicGamesStatus();
                 break;
         }
         this.setLoadingState(false);
