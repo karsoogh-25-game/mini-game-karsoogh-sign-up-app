@@ -73,9 +73,9 @@ exports.registerStep2 = async (req, res) => {
 
   try {
     await transporter.sendMail({
-      from: `"Ligauk Registration" <${process.env.EMAIL_USER}>`,
+      from: `"Karsoogh Mehregan Registration" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: 'کد تأیید ثبت‌نام لیگک',
+      subject: 'کد تأیید ثبت‌نام کارسوق',
       text: `کد: ${code} (۱۰ دقیقه معتبر)`,
       html: htmlContent
     });
