@@ -43,6 +43,12 @@ exports.endInvestmentGame = async (req, res) => {
         await Group.increment('score', { by: reward, where: { id: entry.groupId }, transaction: t });
       }
     }
+    else {
+      for (const entry of entries) {
+        const reward = Math.floor(entry.amount / game.multiplier);
+        await Group.increment('score', { by: reward, where: { id: entry.groupId }, transaction: t });
+      }
+    }
 
     await game.update({ isActive: false }, { transaction: t });
     await InvestmentEntry.destroy({ where: {}, transaction: t });
@@ -101,6 +107,12 @@ exports.endRiskGame = async (req, res) => {
         await Group.increment('score', { by: reward, where: { id: entry.groupId }, transaction: t });
       }
     }
+   else {
+      for (const entry of entries) {
+        const reward = Math.floor(entry.amount / game.multiplier);
+        await Group.increment('score', { by: reward, where: { id: entry.groupId }, transaction: t });
+      }
+    }
 
     await game.update({ isActive: false }, { transaction: t });
     await RiskEntry.destroy({ where: {}, transaction: t });
@@ -116,11 +128,11 @@ exports.endRiskGame = async (req, res) => {
   }
 };
 
-// Status for both games
 exports.getGamesStatus = async (req, res) => {
     try {
         const investmentGame = await InvestmentGame.findOne({ where: { isActive: true } });
         const riskGame = await RiskGame.findOne({ where: { isActive: true } });
+              
         res.json({
             investmentGame,
             riskGame
@@ -130,3 +142,4 @@ exports.getGamesStatus = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+

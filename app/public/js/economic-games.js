@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>ضریب برد: <span class="font-bold text-green-400">${game.multiplier}x</span></p>
         </div>
         <div class="mb-4">
-          <p>مجموع سرمایه‌گذاری شده: <span id="total-invested" class="font-bold">${game.totalInvested}</span></p>
+
           <p>سرمایه‌گذاری شما: <span class="font-bold">${userContribution}</span></p>
         </div>
         <div class="flex items-center space-x-2">
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <p>ضریب برد: <span class="font-bold text-green-400">${game.multiplier}x</span></p>
         </div>
         <div class="mb-4">
-          <p>مجموع ریسک شده: <span id="total-risk" class="font-bold">${game.totalRisk}</span></p>
+
           <p>ریسک شما: <span class="font-bold">${userContribution}</span></p>
         </div>
         <div class="flex items-center space-x-2">

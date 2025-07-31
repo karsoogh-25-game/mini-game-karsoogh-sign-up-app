@@ -13,6 +13,7 @@ exports.getInvestmentStatus = async (req, res) => {
     if (userGroupId) {
         userEntry = await InvestmentEntry.findOne({ where: { gameId: game.id, groupId: userGroupId } });
     }
+	    game.totalInvested=0;
 
     res.json({
       isActive: true,
@@ -88,6 +89,7 @@ exports.getRiskStatus = async (req, res) => {
     if (userGroupId) {
         userEntry = await RiskEntry.findOne({ where: { gameId: game.id, groupId: userGroupId } });
     }
+    game.totalRisk=0;
 
     res.json({
       isActive: true,
@@ -117,11 +119,6 @@ exports.takeRisk = async (req, res) => {
     if (!game) {
       await t.rollback();
       return res.status(400).json({ message: 'No active risk game.' });
-    }
-
-    if (game.totalRisk + amount > game.riskLimit) {
-        await t.rollback();
-        return res.status(400).json({ message: 'Risk amount exceeds the limit.' });
     }
 
     const group = await Group.findByPk(groupId, { transaction: t });
