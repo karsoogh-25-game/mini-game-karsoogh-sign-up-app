@@ -142,8 +142,6 @@ exports.getGamesStatus = async (req, res) => {
             }]
         });
 
-        console.log(`DEBUG: Found ${allGroups.length} total groups.`);
-
         let boysScore = 0;
         let girlsScore = 0;
         let totalScore = 0;
@@ -156,19 +154,13 @@ exports.getGamesStatus = async (req, res) => {
                 const isAllBoys = group.members.every(member => member.gender === 'male');
                 const isAllGirls = group.members.every(member => member.gender === 'female');
 
-                console.log(`DEBUG: Group: "${group.name}", Score: ${currentScore}, Members: ${group.members.length}, AllBoys: ${isAllBoys}, AllGirls: ${isAllGirls}`);
-
                 if (isAllBoys) {
                     boysScore += currentScore;
                 } else if (isAllGirls) {
                     girlsScore += currentScore;
                 }
-            } else {
-                console.log(`DEBUG: Group: "${group.name}" has no members.`);
             }
         });
-
-        console.log(`DEBUG: Final Scores -> Total: ${totalScore}, Boys: ${boysScore}, Girls: ${girlsScore}`);
 
         res.json({
             investmentGame,
