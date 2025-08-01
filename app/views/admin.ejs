@@ -1177,61 +1177,81 @@
       </section>
 
       <section id="economic_games" v-show="activeSection==='economic_games'" class="content-section" :class="{'active fade-in': activeSection==='economic_games'}">
-        <h2 class="text-2xl font-bold mb-6">مدیریت بازی‌های مسابقه</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <h2 class="text-2xl font-bold mb-6">مدیریت بازی‌های مسابقه</h2>
 
-          <!-- Investment Game -->
-          <div class="bg-gray-700 p-6 rounded-lg">
-            <h3 class="text-xl font-semibold mb-4 text-yellow-400">بازی سرمایه‌گذاری</h3>
-            <div v-if="!investmentGame">
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm">حد نصاب (Threshold)</label>
-                  <input type="number" v-model.number="investmentForm.threshold" class="input-field w-full">
-                </div>
-                <div>
-                  <label class="block text-sm">ضریب (Multiplier)</label>
-                  <input type="number" step="0.1" v-model.number="investmentForm.multiplier" class="input-field w-full">
-                </div>
-                <button @click="startInvestmentGame" class="btn-primary w-full">شروع بازی سرمایه‌گذاری</button>
+          <!-- Score Summary Section -->
+          <div class="bg-gray-800 p-4 rounded-lg mb-8">
+              <h3 class="text-lg font-semibold mb-4 border-b border-gray-600 pb-2">خلاصه امتیازات کل</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                  <div class="bg-gray-700 p-4 rounded">
+                      <p class="text-sm text-gray-400">مجموع امتیازات گروه‌های پسرانه</p>
+                      <p class="text-2xl font-bold text-blue-400">{{ totalScores.boys.toLocaleString() }}</p>
+                  </div>
+                  <div class="bg-gray-700 p-4 rounded">
+                      <p class="text-sm text-gray-400">مجموع امتیازات گروه‌های دخترانه</p>
+                      <p class="text-2xl font-bold text-pink-400">{{ totalScores.girls.toLocaleString() }}</p>
+                  </div>
+                  <div class="bg-gray-700 p-4 rounded">
+                      <p class="text-sm text-gray-400">مجموع کل امتیازات</p>
+                      <p class="text-2xl font-bold text-green-400">{{ totalScores.total.toLocaleString() }}</p>
+                  </div>
               </div>
-            </div>
-            <div v-else>
-              <p>وضعیت: <span class="text-green-400 font-bold">فعال</span></p>
-              <p>حد نصاب: {{ investmentGame.threshold }}</p>
-              <p>ضریب: {{ investmentGame.multiplier }}</p>
-              <p>مجموع سرمایه‌گذاری شده: {{ investmentGame.totalInvested }}</p>
-              <button @click="endInvestmentGame" class="btn-danger w-full mt-4">پایان و محاسبه نتایج</button>
-            </div>
           </div>
 
-          <!-- Risk Game -->
-          <div class="bg-gray-700 p-6 rounded-lg">
-            <h3 class="text-xl font-semibold mb-4 text-cyan-400">بازی ریسک</h3>
-            <div v-if="!riskGame">
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm">حد ریسک (Risk Limit)</label>
-                  <input type="number" v-model.number="riskForm.riskLimit" class="input-field w-full">
-                </div>
-                <div>
-                  <label class="block text-sm">ضریب (Multiplier)</label>
-                  <input type="number" step="0.1" v-model.number="riskForm.multiplier" class="input-field w-full">
-                </div>
-                <button @click="startRiskGame" class="btn-primary w-full">شروع بازی ریسک</button>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <!-- Investment Game -->
+              <div class="bg-gray-700 p-6 rounded-lg">
+                  <h3 class="text-xl font-semibold mb-4 text-yellow-400">بازی سرمایه‌گذاری</h3>
+                  <div v-if="!investmentGame">
+                      <div class="space-y-4">
+                          <div>
+                              <label class="block text-sm">حد نصاب (Threshold)</label>
+                              <input type="number" v-model.number="investmentForm.threshold" class="input-field w-full">
+                          </div>
+                          <div>
+                              <label class="block text-sm">ضریب (Multiplier)</label>
+                              <input type="number" step="0.1" v-model.number="investmentForm.multiplier" class="input-field w-full">
+                          </div>
+                          <button @click="startInvestmentGame" class="btn-primary w-full">شروع بازی سرمایه‌گذاری</button>
+                      </div>
+                  </div>
+                  <div v-else>
+                      <p>وضعیت: <span class="text-green-400 font-bold">فعال</span></p>
+                      <p>حد نصاب: {{ investmentGame.threshold }}</p>
+                      <p>ضریب: {{ investmentGame.multiplier }}</p>
+                      <p>مجموع سرمایه‌گذاری شده: {{ investmentGame.totalInvested }}</p>
+                      <button @click="endInvestmentGame" class="btn-danger w-full mt-4">پایان و محاسبه نتایج</button>
+                  </div>
               </div>
-            </div>
-            <div v-else>
-              <p>وضعیت: <span class="text-green-400 font-bold">فعال</span></p>
-              <p>حد ریسک: {{ riskGame.riskLimit }}</p>
-              <p>ضریب: {{ riskGame.multiplier }}</p>
-              <p>مجموع ریسک شده: {{ riskGame.totalRisk }}</p>
-              <button @click="endRiskGame" class="btn-danger w-full mt-4">پایان و محاسبه نتایج</button>
-            </div>
-          </div>
 
-        </div>
+              <!-- Risk Game -->
+              <div class="bg-gray-700 p-6 rounded-lg">
+                  <h3 class="text-xl font-semibold mb-4 text-cyan-400">بازی ریسک</h3>
+                  <div v-if="!riskGame">
+                      <div class="space-y-4">
+                          <div>
+                              <label class="block text-sm">حد ریسک (Risk Limit)</label>
+                              <input type="number" v-model.number="riskForm.riskLimit" class="input-field w-full">
+                          </div>
+                          <div>
+                              <label class="block text-sm">ضریب (Multiplier)</label>
+                              <input type="number" step="0.1" v-model.number="riskForm.multiplier" class="input-field w-full">
+                          </div>
+                          <button @click="startRiskGame" class="btn-primary w-full">شروع بازی ریسک</button>
+                      </div>
+                  </div>
+                  <div v-else>
+                      <p>وضعیت: <span class="text-green-400 font-bold">فعال</span></p>
+                      <p>حد ریسک: {{ riskGame.riskLimit }}</p>
+                      <p>ضریب: {{ riskGame.multiplier }}</p>
+                      <p>مجموع ریسک شده: {{ riskGame.totalRisk }}</p>
+                      <button @click="endRiskGame" class="btn-danger w-full mt-4">پایان و محاسبه نتایج</button>
+                  </div>
+              </div>
+
+          </div>
       </section>
+
 
       </div>
   </div>
